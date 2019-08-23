@@ -2,7 +2,7 @@
 
 var postcss = require('postcss');
 var objectAssign = require('object-assign');
-var pxRegex = require('./lib/pixel-unit-regex');
+var remRegex = require('./lib/rem-unit-regex');
 var filterPropList = require('./lib/filter-prop-list');
 
 var defaults = {
@@ -12,24 +12,13 @@ var defaults = {
     propList: ['font', 'font-size', 'line-height', 'letter-spacing'],
     replace: true,
     mediaQuery: false,
-    minPixelValue: 0
+    minRemValue: 0
 };
 
-var legacyOptions = {
-    'root_value': 'rootValue',
-    'unit_precision': 'unitPrecision',
-    'selector_black_list': 'selectorBlackList',
-    'prop_white_list': 'propList',
-    'media_query': 'mediaQuery',
-    'propWhiteList': 'propList'
-};
-
-module.exports = postcss.plugin('postcss-pxtorem', function (options) {
-
-    convertLegacyOptions(options);
+module.exports = postcss.plugin('postcss-rem-to-px', function (options) {
 
     var opts = objectAssign({}, defaults, options);
-    var pxReplace = createPxReplace(opts.rootValue, opts.unitPrecision, opts.minPixelValue);
+    var remReplace = createRemReplace(opts.rootValue, opts.unitPrecision, opts.minRemValue);
 
     var satisfyPropList = createPropListMatcher(opts.propList);
 
@@ -37,15 +26,15 @@ module.exports = postcss.plugin('postcss-pxtorem', function (options) {
 
         css.walkDecls(function (decl, i) {
             // This should be the fastest test and will remove most declarations
-            if (decl.value.indexOf('px') === -1) return;
+            if (decl.value.indexOf('rem') === -1) return;
 
             if (!satisfyPropList(decl.prop)) return;
 
             if (blacklistedSelector(opts.selectorBlackList, decl.parent.selector)) return;
 
-            var value = decl.value.replace(pxRegex, pxReplace);
+            var value = decl.value.replace(remRegex, remReplace);
 
-            // if rem unit already exists, do not add or replace
+            // if px unit already exists, do not add or replace
             if (declarationExists(decl.parent, decl.prop, value)) return;
 
             if (opts.replace) {
@@ -57,42 +46,21 @@ module.exports = postcss.plugin('postcss-pxtorem', function (options) {
 
         if (opts.mediaQuery) {
             css.walkAtRules('media', function (rule) {
-                if (rule.params.indexOf('px') === -1) return;
-                rule.params = rule.params.replace(pxRegex, pxReplace);
+                if (rule.params.indexOf('rem') === -1) return;
+                rule.params = rule.params.replace(remRegex, remReplace);
             });
         }
 
     };
 });
 
-function convertLegacyOptions(options) {
-    if (typeof options !== 'object') return;
-    if (
-            (
-                (typeof options['prop_white_list'] !== 'undefined' && options['prop_white_list'].length === 0) ||
-                (typeof options.propWhiteList !== 'undefined' && options.propWhiteList.length === 0)
-            ) &&
-            typeof options.propList === 'undefined'
-        ) {
-        options.propList = ['*'];
-        delete options['prop_white_list'];
-        delete options.propWhiteList;
-    }
-    Object.keys(legacyOptions).forEach(function (key) {
-        if (options.hasOwnProperty(key)) {
-            options[legacyOptions[key]] = options[key];
-            delete options[key];
-        }
-    });
-}
-
-function createPxReplace (rootValue, unitPrecision, minPixelValue) {
+function createRemReplace (rootValue, unitPrecision, minRemValue) {
     return function (m, $1) {
         if (!$1) return m;
-        var pixels = parseFloat($1);
-        if (pixels < minPixelValue) return m;
-        var fixedVal = toFixed((pixels / rootValue), unitPrecision);
-        return (fixedVal === 0) ? '0' : fixedVal + 'rem';
+        var rems = parseFloat($1);
+        if (rems < minRemValue) return m;
+        var fixedVal = toFixed((rems * rootValue), unitPrecision);
+        return (fixedVal === 0) ? '0' : fixedVal + 'px';
     };
 }
 
