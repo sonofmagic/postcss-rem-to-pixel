@@ -1,7 +1,7 @@
 {
   "name": "postcss-rem-to-px",
   "description": "Convert rem (root em) units to px units using PostCSS. Based on postcss-pxtorem.",
-  "version": "0.0.1",
+  "version": "4.1.1",
   "author": "cuth, jesstech",
   "license": "MIT",
   "repository": {
