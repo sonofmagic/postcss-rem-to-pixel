@@ -1,11 +1,11 @@
-# postcss-rem-to-px [![NPM version](https://badge.fury.io/js/postcss-rem-to-px.svg)](http://badge.fury.io/js/postcss-rem-to-px)
+# postcss-rem-to-pixel [![NPM version](https://badge.fury.io/js/postcss-rem-to-pixel.svg)](http://badge.fury.io/js/postcss-rem-to-pixel)
 
 A plugin for [PostCSS](https://github.com/ai/postcss) that generates px units from rem units.
 
 ## Install
 
 ```shell
-$ npm install postcss-rem-to-px --save-dev
+$ npm install postcss-rem-to-pixel --save-dev
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ h1 {
 ```js
 var fs = require('fs');
 var postcss = require('postcss');
-var remToPx = require('postcss-rem-to-px');
+var remToPx = require('postcss-rem-to-pixel');
 var css = fs.readFileSync('main.css', 'utf8');
 var options = {
     replace: false
@@ -95,7 +95,7 @@ Default:
 var gulp = require('gulp');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer');
-var remToPx = require('postcss-rem-to-px');
+var remToPx = require('postcss-rem-to-pixel');
 
 gulp.task('css', function () {
 
@@ -123,7 +123,7 @@ Currently, the easiest way to have a single property ignored is to use a capital
     font-size: 1rem; // converted to 16px
 }
 
-// `Rem` or `REM` is ignored by `postcss-rem-to-px` but still accepted by browsers
+// `Rem` or `REM` is ignored by `postcss-rem-to-pixel` but still accepted by browsers
 .ignore {
     border: 1Rem solid; // ignored
     border-width: 2REM; // ignored

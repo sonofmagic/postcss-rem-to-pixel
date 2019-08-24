@@ -15,7 +15,7 @@ var defaults = {
     minRemValue: 0
 };
 
-module.exports = postcss.plugin('postcss-rem-to-px', function (options) {
+module.exports = postcss.plugin('postcss-rem-to-pixel', function (options) {
 
     var opts = objectAssign({}, defaults, options);
     var remReplace = createRemReplace(opts.rootValue, opts.unitPrecision, opts.minRemValue);
