@@ -1,16 +1,16 @@
-# postcss-pxtorem [![NPM version](https://badge.fury.io/js/postcss-pxtorem.svg)](http://badge.fury.io/js/postcss-pxtorem)
+# postcss-rem-to-px [![NPM version](https://badge.fury.io/js/postcss-rem-to-px.svg)](http://badge.fury.io/js/postcss-rem-to-px)
 
-A plugin for [PostCSS](https://github.com/ai/postcss) that generates rem units from pixel units.
+A plugin for [PostCSS](https://github.com/ai/postcss) that generates px units from rem units.
 
 ## Install
 
 ```shell
-$ npm install postcss-pxtorem --save-dev
+$ npm install postcss-rem-to-px --save-dev
 ```
 
 ## Usage
 
-Pixels are the easiest unit to use (*opinion*). The only issue with them is that they don't let browsers change the default font size of 16. This script converts every px value to a rem from the properties you choose to allow the browser to set the font size.
+Sometimes you need to include a third-party css file that uses rems.  Great pracitice!  Unless you can't afford to change your body font-size just for some vendor.  This script converts every rem value to a px value from the properties you choose using a default font size of 16px.
 
 
 ### Input/Output
@@ -21,17 +21,17 @@ Pixels are the easiest unit to use (*opinion*). The only issue with them is that
 // input
 h1 {
     margin: 0 0 20px;
-    font-size: 32px;
+    font-size: 2rem;
     line-height: 1.2;
-    letter-spacing: 1px;
+    letter-spacing: 0.0625rem;
 }
 
 // output
 h1 {
     margin: 0 0 20px;
-    font-size: 2rem;
+    font-size: 32px;
     line-height: 1.2;
-    letter-spacing: 0.0625rem;
+    letter-spacing: 1px;
 }
 ```
 
@@ -40,14 +40,14 @@ h1 {
 ```js
 var fs = require('fs');
 var postcss = require('postcss');
-var pxtorem = require('postcss-pxtorem');
+var remToPx = require('postcss-rem-to-px');
 var css = fs.readFileSync('main.css', 'utf8');
 var options = {
     replace: false
 };
-var processedCss = postcss(pxtorem(options)).process(css).css;
+var processedCss = postcss(remToPx(options)).process(css).css;
 
-fs.writeFile('main-rem.css', processedCss, function (err) {
+fs.writeFile('main-px.css', processedCss, function (err) {
   if (err) {
     throw err;
   }
@@ -67,26 +67,26 @@ Default:
     selectorBlackList: [],
     replace: true,
     mediaQuery: false,
-    minPixelValue: 0
+    minRemValue: 0
 }
 ```
 
 - `rootValue` (Number) The root element font size.
-- `unitPrecision` (Number) The decimal numbers to allow the REM units to grow to.
-- `propList` (Array) The properties that can change from px to rem.
+- `unitPrecision` (Number) The decimal precision px units are allowed to use, floored (rounding down on half).
+- `propList` (Array) The properties that can change from rem to px.
     - Values need to be exact matches.
     - Use wildcard `*` to enable all properties. Example: `['*']`
     - Use `*` at the start or end of a word. (`['*position*']` will match `background-position-y`)
     - Use `!` to not match a property. Example: `['*', '!letter-spacing']`
     - Combine the "not" prefix with the other prefixes. Example: `['*', '!font*']` 
-- `selectorBlackList` (Array) The selectors to ignore and leave as px.
+- `selectorBlackList` (Array) The selectors to ignore and leave as rem.
     - If value is string, it checks to see if selector contains the string.
         - `['body']` will match `.body-class`
     - If value is regexp, it checks to see if the selector matches the regexp.
         - `[/^body$/]` will match `body` but not `.body`
 - `replace` (Boolean) replaces rules containing rems instead of adding fallbacks.
-- `mediaQuery` (Boolean) Allow px to be converted in media queries.
-- `minPixelValue` (Number) Set the minimum pixel value to replace.
+- `mediaQuery` (Boolean) Allow rem to be converted in media queries.
+- `minRemValue` (Number) Set the minimum rem value to replace.
 
 
 ### Use with gulp-postcss and autoprefixer
@@ -95,7 +95,7 @@ Default:
 var gulp = require('gulp');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer');
-var pxtorem = require('postcss-pxtorem');
+var remToPx = require('postcss-rem-to-px');
 
 gulp.task('css', function () {
 
@@ -103,7 +103,7 @@ gulp.task('css', function () {
         autoprefixer({
             browsers: 'last 1 version'
         }),
-        pxtorem({
+        remToPx({
             replace: false
         })
     ];
@@ -115,17 +115,17 @@ gulp.task('css', function () {
 ```
 
 ### A message about ignoring properties
-Currently, the easiest way to have a single property ignored is to use a capital in the pixel unit declaration.
+Currently, the easiest way to have a single property ignored is to use a capital in the rem unit declaration.
 
 ```css
-// `px` is converted to `rem`
+// `rem` is converted to `px`
 .convert {
-    font-size: 16px; // converted to 1rem
+    font-size: 1rem; // converted to 16px
 }
 
-// `Px` or `PX` is ignored by `postcss-pxtorem` but still accepted by browsers
+// `Rem` or `REM` is ignored by `postcss-rem-to-px` but still accepted by browsers
 .ignore {
-    border: 1Px solid; // ignored
-    border-width: 2PX; // ignored
+    border: 1Rem solid; // ignored
+    border-width: 2REM; // ignored
 }
 ```
