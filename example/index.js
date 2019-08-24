@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable */
 
 var fs = require('fs');
 var postcss = require('postcss');
@@ -9,9 +10,10 @@ var options = {
 };
 var processedCss = postcss(remToPx(options)).process(css).css;
 
-fs.writeFile('main-rem.css', processedCss, function (err) {
+fs.writeFile('main-px.css', processedCss, function (err) {
   if (err) {
     throw err;
   }
-  console.log('Rem file written.');
+  console.log('px file written.');
 });
+
