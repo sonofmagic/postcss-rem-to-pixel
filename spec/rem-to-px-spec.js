@@ -8,6 +8,7 @@
 'use strict';
 var postcss = require('postcss');
 var remToPx = require('..');
+
 var basicCSS = '.rule { font-size: 0.9375rem }';
 var filterPropList = require('../lib/filter-prop-list');
 
@@ -120,13 +121,13 @@ describe('unitPrecision', function () {
     });
 });
 
-describe('propWhiteList', function () {
+describe('propList', function () {
 
     it('should only replace properties in the prop list', function () {
         var rules    = '.rule { font-size: 1rem; margin: 1rem; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }';
         var expected = '.rule { font-size: 16px; margin: 16px; margin-left: 0.5rem; padding: 0.5rem; padding-right: 16px }';
         var options = {
-            propWhiteList: ['*font*', 'margin*', '!margin-left', '*-right', 'pad']
+            propList: ['*font*', 'margin*', '!margin-left', '*-right', 'pad']
         };
         var processed = postcss(remToPx(options)).process(rules).css;
 
@@ -137,18 +138,18 @@ describe('propWhiteList', function () {
         var rules    = '.rule { font-size: 1rem; margin: 1rem; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }';
         var expected = '.rule { font-size: 1rem; margin: 16px; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }';
         var options = {
-            propWhiteList: ['*', '!margin-left', '!*padding*', '!font*']
+            propList: ['*', '!margin-left', '!*padding*', '!font*']
         };
         var processed = postcss(remToPx(options)).process(rules).css;
 
         expect(processed).toBe(expected);
     });
 
-    it('should replace all properties when white list is empty', function () {
+    it('should replace all properties when white list is wildcard', function () {
         var rules    = '.rule { margin: 1rem; font-size: 0.9375rem }';
         var expected = '.rule { margin: 16px; font-size: 15px }';
         var options = {
-            propWhiteList: []
+            propList: ['*']
         };
         var processed = postcss(remToPx(options)).process(rules).css;
 
@@ -218,11 +219,11 @@ describe('mediaQuery', function () {
 
 describe('minRemValue', function () {
     it('should not replace values below minRemValue', function () {
-        var rules    = '.rule { border: 1px solid #000; font-size: 1rem; margin: 1rem 0.625rem; }';
-        var expected = '.rule { border: 1px solid #000; font-size: 16px; margin: 1rem 10px; }';
+        var rules = '.rule { border: 0.0625rem solid #000; font-size: 1rem; margin: 0.0625rem 0.625rem; }';
+        var expected = '.rule { border: 0.0625rem solid #000; font-size: 16px; margin: 0.0625rem 10px; }';
         var options = {
-            propWhiteList: [],
-            minRemValue: 2
+            propList: ['*'],
+            minRemValue: 0.5
         };
         var processed = postcss(remToPx(options)).process(rules).css;
 
