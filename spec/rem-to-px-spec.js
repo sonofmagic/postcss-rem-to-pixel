@@ -7,6 +7,7 @@
 
 'use strict';
 var postcss = require('postcss');
+var pxToRem = require('postcss-pxtorem');
 var remToPx = require('..');
 
 var basicCSS = '.rule { font-size: 0.9375rem }';
@@ -228,6 +229,16 @@ describe('minRemValue', function () {
         var processed = postcss(remToPx(options)).process(rules).css;
 
         expect(processed).toBe(expected);
+    });
+});
+
+describe('pxToRem', function () {
+    it('should convert from px to rem and back using postcss-pxtorem', function () {
+        var input = 'h1 { margin: 0 0 20px 0.5rem; font-size: 13px; line-height: 1.2; letter-spacing: 1px; }';
+        var toRems = postcss(pxToRem()).process(input).css;
+        var processed = postcss(remToPx()).process(toRems).css;
+
+        expect(processed).toBe(input);
     });
 });
 

@@ -14,7 +14,8 @@
     "test": "jasmine-node spec"
   },
   "devDependencies": {
-    "jasmine-node": "~1.11.0"
+    "jasmine-node": "~1.11.0",
+    "postcss-pxtorem": "^4.0.1"
   },
   "keywords": [
     "css",
